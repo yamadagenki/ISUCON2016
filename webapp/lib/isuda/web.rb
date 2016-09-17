@@ -23,6 +23,7 @@ module Isuda
     set :session_secret, 'tonymoris'
     set :isupam_origin, ENV['ISUPAM_ORIGIN'] || 'http://localhost:5050'
     set :isutar_origin, ENV['ISUTAR_ORIGIN'] || 'http://localhost:5000'
+    set :root, '/home/isucon'
 
     configure :development do
       require 'sinatra/reloader'
