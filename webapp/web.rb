@@ -117,12 +117,7 @@ module Isuda
       end
 
       def load_stars(keyword)
-        isutar_url = URI(settings.isutar_origin)
-        isutar_url.path = '/stars'
-        isutar_url.query = URI.encode_www_form(keyword: keyword)
-        body = Net::HTTP.get(isutar_url)
-        stars_res = JSON.parse(body)
-        stars_res['stars']
+        stars = db.xquery(%| select * from star where keyword = ? |, keyword).to_a
       end
 
       def redirect_found(path)
