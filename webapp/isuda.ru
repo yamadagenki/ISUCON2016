@@ -1,5 +1,5 @@
 #!rackup
 
-require_relative './lib/isuda/web.rb'
+require_relative './web.rb'
 
 run Isuda::Web
