@@ -25,13 +25,12 @@ module Isuda
     set :isutar_origin, ENV['ISUTAR_ORIGIN'] || 'http://localhost:5000'
     set :root, ENV['SINATRA_ROOT'] || File.expand_path('../../../', __FILE__)
 
+    file = File.new("#{settings.root}/log/#{settings.environment}.log", 'a+')
+    file.sync = true
+    use Rack::CommonLogger, file
+      
     configure :development do
       require 'sinatra/reloader'
-
-      file = File.new("#{settings.root}/log/#{settings.environment}.log", 'a+')
-      file.sync = true
-      use Rack::CommonLogger, file
-
       register Sinatra::Reloader
     end
 
