@@ -8,3 +8,4 @@ ISUTAR_DB_USER=isucon
 ISUTAR_DB_PASSWORD=isucon
 
 SINATRA_ROOT=/home/isucon
+SINATRA_PUBLIC_DIR=/home/isucon/webapp/public
