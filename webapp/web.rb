@@ -116,8 +116,8 @@ module Isuda
         Rack::Utils.escape_path(str)
       end
 
-      def load_stars(keyword)
-        stars = db.xquery(%| select * from star where keyword = ? |, keyword).to_a
+      def load_stars(entry_id)
+        stars = db.xquery(%| select * from star where entry_id = ? |, entry_id.to_i).to_a
       end
 
       def redirect_found(path)
@@ -145,7 +145,7 @@ module Isuda
       |)
       entries.each do |entry|
         entry[:html] = htmlify(entry[:description])
-        entry[:stars] = load_stars(entry[:keyword])
+        entry[:stars] = load_stars(entry[:id])
       end
 
       total_entries = db.xquery(%| SELECT count(*) AS total_entries FROM entry |).first[:total_entries].to_i
@@ -165,26 +165,21 @@ module Isuda
     end
 
     get '/stars' do
-      keyword = params[:keyword] || ''
-      stars = db.xquery(%| select * from star where keyword = ? |, keyword).to_a
+      entry_id = params[:entry_id] || 0
 
       content_type :json
-      JSON.generate(stars: stars)
+      JSON.generate(stars: load_stars(entry_id))
     end
 
     post '/stars' do
-      keyword = params[:keyword]
-
-      isuda_keyword_url = URI(settings.isutar_origin)
-      isuda_keyword_url.path = '/keyword/%s' % [Rack::Utils.escape_path(keyword)]
-      res = Net::HTTP.get_response(isuda_keyword_url)
-      halt(404) unless Net::HTTPSuccess === res
+      entry_id = params[:entry_id].to_i
+      # TODO: Entryの存在確認
 
       user_name = params[:user]
       db.xquery(%|
-        INSERT INTO star (keyword, user_name, created_at)
+        INSERT INTO star (entry_id, user_name, created_at)
         VALUES (?, ?, NOW())
-      |, keyword, user_name)
+      |, entry_id, user_name)
 
       content_type :json
       JSON.generate(result: 'ok')
@@ -253,7 +248,7 @@ module Isuda
       keyword = params[:keyword] or halt(400)
 
       entry = db.xquery(%| select * from entry where keyword = ? |, keyword).first or halt(404)
-      entry[:stars] = load_stars(entry[:keyword])
+      entry[:stars] = load_stars(entry[:id])
       entry[:html] = htmlify(entry[:description])
 
       locals = {

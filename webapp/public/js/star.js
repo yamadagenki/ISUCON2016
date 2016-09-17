@@ -1,17 +1,17 @@
 $('.js-add-star').on('click', function() {
     var elem = this;
-    var keyword = elem.getAttribute('data-keyword');
+    var entryId = elem.getAttribute('data-entry');
     var userName = elem.getAttribute('data-user-name');
-    if (!keyword || !userName) {
+    if (!entryId || !userName) {
         alert('Please login.');
         return
     }
     $.post('/stars', {
-        keyword: keyword,
+        entry_id: entryId,
         user: userName
     }).done(function() {
         $('.js-stars').filter(function() {
-            return this.getAttribute('data-keyword') == keyword;
+            return this.getAttribute('data-entry') == entryId;
         }).trigger('addStar');
     });
 });
