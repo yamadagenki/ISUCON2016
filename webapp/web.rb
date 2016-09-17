@@ -31,6 +31,7 @@ module Isuda
       
     configure :development do
       require 'sinatra/reloader'
+      require 'pry'
       register Sinatra::Reloader
     end
 
