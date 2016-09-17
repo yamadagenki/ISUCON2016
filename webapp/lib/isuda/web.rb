@@ -27,6 +27,10 @@ module Isuda
     configure :development do
       require 'sinatra/reloader'
 
+      file = File.new("#{settings.root}/log/#{settings.environment}.log", 'a+')
+      file.sync = true
+      use Rack::CommonLogger, file
+
       register Sinatra::Reloader
     end
 
