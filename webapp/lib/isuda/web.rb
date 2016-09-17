@@ -67,8 +67,7 @@ module Isuda
       end
 
       def register(name, pw)
-        chars = [*'A'..'~']
-        salt = 1.upto(20).map { chars.sample }.join('')
+        salt = SecureRandom.hex(20)
         salted_password = encode_with_salt(password: pw, salt: salt)
         db.xquery(%|
           INSERT INTO user (name, salt, password, created_at)
