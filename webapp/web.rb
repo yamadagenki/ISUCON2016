@@ -22,13 +22,13 @@ module Isuda
     set :dsn, ENV['ISUDA_DSN'] || 'dbi:mysql:db=isuda'
     set :session_secret, 'tonymoris'
     set :isupam_origin, ENV['ISUPAM_ORIGIN'] || 'http://localhost:5050'
-    set :isutar_origin, ENV['ISUTAR_ORIGIN'] || 'http://localhost:5000'
+    set :isutar_origin, ENV['ISUTAR_ORIGIN'] || 'http://localhost:5001'
     set :root, ENV['SINATRA_ROOT'] || File.expand_path('../', __FILE__)
 
     file = File.new("#{settings.root}/log/#{settings.environment}.log", 'a+')
     file.sync = true
     use Rack::CommonLogger, file
-      
+
     configure :development do
       require 'sinatra/reloader'
       require 'pry'
@@ -127,8 +127,7 @@ module Isuda
 
     get '/initialize' do
       db.xquery(%| DELETE FROM entry WHERE id > 7101 |)
-      db.xquery('TRUNCATE star')
-  
+
       content_type :json
       JSON.generate(result: 'ok')
     end
@@ -162,26 +161,6 @@ module Isuda
         last_page: last_page,
       }
       erb :index, locals: locals
-    end
-
-    get '/stars' do
-      keyword = params[:keyword] || ''
-      stars = db.xquery(%| select * from star where keyword = ? |, keyword).to_a
-
-      content_type :json
-      JSON.generate(stars: stars)
-    end
-
-    post '/stars' do
-      keyword = params[:keyword]
-      user_name = params[:user]
-      db.xquery(%|
-        INSERT INTO star (keyword, user_name, created_at)
-        VALUES (?, ?, NOW())
-      |, keyword, user_name)
-
-      content_type :json
-      JSON.generate(result: 'ok')
     end
 
     get '/robots.txt' do
